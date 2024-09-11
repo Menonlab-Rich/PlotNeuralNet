@@ -8,7 +8,8 @@ def to_head( projectpath ):
 \usepackage{import}
 \subimport{"""+ pathlayers + r"""}{init}
 \usetikzlibrary{positioning}
-\usetikzlibrary{3d} %for including external image 
+\usetikzlibrary{3d} %for including external image
+\tikzset{every edge/.style={label distance=4em}} %for adjusting the position of the labels
 """
 
 def to_cor():
@@ -40,8 +41,15 @@ def to_input( pathfile, to='(-3,0,0)', width=8, height=8, name="temp" ):
 \node[canvas is zy plane at x=0] (""" + name + """) at """+ to +""" {\includegraphics[width="""+ str(width)+"cm"+""",height="""+ str(height)+"cm"+"""]{"""+ pathfile +"""}};
 """
 
+def to_output(pathfile, to='(0, 0, 0)', offset=0, width=8, height=8, name="output"):
+    return r"""
+\coordinate (end_of_axis) at ($(pic cs:""" + to + """) + (2,0,0)$);""" + r"""
+\node[canvas is zy plane at x=""" + str(offset) + """] (""" + name + """) at (end_of_axis) {\includegraphics[width=""" + str(width) + "cm" + """,height=""" + str(height) + "cm" + """]{""" + pathfile + """}};
+"""
+
+
 # Conv
-def to_Conv( name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", width=1, height=40, depth=40, caption=" " ):
+def to_Conv( name, s_filer=256, n_filer=64, x_size=20, z_size=20, x_angle=45, z_angle=None, x_shift="(0, 0)", z_shift="(0, 0)", offset="(0,0,0)", to="(0,0,0)", width=1, height=40, depth=40, caption=" " ):
     return r"""
 \pic[shift={"""+ offset +"""}] at """+ to +""" 
     {Box={
@@ -52,7 +60,8 @@ def to_Conv( name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", widt
         fill=\ConvColor,
         height="""+ str(height) +""",
         width="""+ str(width) +""",
-        depth="""+ str(depth) +"""
+        depth="""+ str(depth) +""",
+        """ + (f"xlabelsize={x_size}, " if x_size is not None else "") + (f"zlabelsize={z_size}, " if z_size is not None else "") + (f"xlabelshift={{{x_shift}}}, " if x_shift is not None else "") + (f"zlabelshift={{{z_shift}}}, " if z_shift is not None else "") + (f"xlabelangle={x_angle}, " if x_angle is not None else "") + (f"zlabelangle={z_angle}, " if z_angle is not None else "") + """
         }
     };
 """
@@ -79,7 +88,7 @@ def to_ConvConvRelu( name, s_filer=256, n_filer=(64,64), offset="(0,0,0)", to="(
 
 
 # Pool
-def to_Pool(name, offset="(0,0,0)", to="(0,0,0)", width=1, height=32, depth=32, opacity=0.5, caption=" "):
+def to_Pool(name, offset="(0,0,0)", to="(0,0,0)", width=1, height=32, depth=32, opacity=0.5, caption=" ", x_size=20, z_size=20, x_shift="(0, 0)", z_shift="(0, 0)", x_angle=None, z_angle=None):
     return r"""
 \pic[shift={ """+ offset +""" }] at """+ to +""" 
     {Box={
@@ -89,13 +98,14 @@ def to_Pool(name, offset="(0,0,0)", to="(0,0,0)", width=1, height=32, depth=32, 
         opacity="""+ str(opacity) +""",
         height="""+ str(height) +""",
         width="""+ str(width) +""",
-        depth="""+ str(depth) +"""
+        depth="""+ str(depth) +""",
+        """ + (f"xlabelsize={x_size}, " if x_size is not None else "") + (f"zlabelsize={z_size}, " if z_size is not None else "") + (f"xlabelshift={{{x_shift}}}, " if x_shift is not None else "") + (f"zlabelshift={{{z_shift}}}, " if z_shift is not None else "") + (f"xlabelangle={x_angle}, " if x_angle is not None else "") + (f"zlabelangle={z_angle}, " if z_angle is not None else "") + """
         }
     };
 """
 
 # unpool4, 
-def to_UnPool(name, offset="(0,0,0)", to="(0,0,0)", width=1, height=32, depth=32, opacity=0.5, caption=" "):
+def to_UnPool(name, offset="(0,0,0)", to="(0,0,0)", width=1, height=32, depth=32, opacity=0.5, caption=" ", x_size=20, z_size=20, x_shift="(0, 0)", z_shift="(0, 0)", x_angle=None, z_angle=None):
     return r"""
 \pic[shift={ """+ offset +""" }] at """+ to +""" 
     {Box={
@@ -105,7 +115,8 @@ def to_UnPool(name, offset="(0,0,0)", to="(0,0,0)", width=1, height=32, depth=32
         opacity="""+ str(opacity) +""",
         height="""+ str(height) +""",
         width="""+ str(width) +""",
-        depth="""+ str(depth) +"""
+        depth="""+ str(depth) +""",
+        """ + (f"xlabelsize={x_size}, " if x_size is not None else "") + (f"zlabelsize={z_size}, " if z_size is not None else "") + (f"xlabelshift={{{x_shift}}}, " if x_shift is not None else "") + (f"zlabelshift={{{z_shift}}}, " if z_shift is not None else "") + (f"xlabelangle={x_angle}, " if x_angle is not None else "") + (f"zlabelangle={z_angle}, " if z_angle is not None else "") + """
         }
     };
 """
@@ -132,7 +143,7 @@ def to_ConvRes( name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", w
 
 
 # ConvSoftMax
-def to_ConvSoftMax( name, s_filer=40, offset="(0,0,0)", to="(0,0,0)", width=1, height=40, depth=40, caption=" " ):
+def to_ConvSoftMax( name, s_filer=40, offset="(0,0,0)", to="(0,0,0)", width=1, height=40, depth=40, caption=" ", x_size=20, z_size=20, x_shift="(0, 0)", z_shift="(0, 0)", x_angle=None, z_angle=None):
     return r"""
 \pic[shift={"""+ offset +"""}] at """+ to +""" 
     {Box={
@@ -142,13 +153,14 @@ def to_ConvSoftMax( name, s_filer=40, offset="(0,0,0)", to="(0,0,0)", width=1, h
         fill=\SoftmaxColor,
         height="""+ str(height) +""",
         width="""+ str(width) +""",
-        depth="""+ str(depth) +"""
+        depth="""+ str(depth) +""",
+        """ + (f"xlabelsize={x_size}, " if x_size is not None else "") + (f"zlabelsize={z_size}, " if z_size is not None else "") + (f"xlabelshift={{{x_shift}}}, " if x_shift is not None else "") + (f"zlabelshift={{{z_shift}}}, " if z_shift is not None else "") + (f"xlabelangle={x_angle}, " if x_angle is not None else "") + (f"zlabelangle={z_angle}, " if z_angle is not None else "") + """
         }
     };
 """
 
 # SoftMax
-def to_SoftMax( name, s_filer=10, offset="(0,0,0)", to="(0,0,0)", width=1.5, height=3, depth=25, opacity=0.8, caption=" " ):
+def to_SoftMax( name, s_filer=10, offset="(0,0,0)", to="(0,0,0)", width=1.5, height=3, depth=25, opacity=0.8, caption=" ", x_size=20, z_size=20, x_shift="(0, 0)", z_shift="(0, 0)", x_angle=None, z_angle=None):
     return r"""
 \pic[shift={"""+ offset +"""}] at """+ to +""" 
     {Box={
@@ -160,7 +172,8 @@ def to_SoftMax( name, s_filer=10, offset="(0,0,0)", to="(0,0,0)", width=1.5, hei
         opacity="""+ str(opacity) +""",
         height="""+ str(height) +""",
         width="""+ str(width) +""",
-        depth="""+ str(depth) +"""
+        depth="""+ str(depth) +""",
+        """ + (f"xlabelsize={x_size}, " if x_size is not None else "") + (f"zlabelsize={z_size}, " if z_size is not None else "") + (f"xlabelshift={{{x_shift}}}, " if x_shift is not None else "") + (f"zlabelshift={{{z_shift}}}, " if z_shift is not None else "") + (f"xlabelangle={x_angle}, " if x_angle is not None else "") + (f"zlabelangle={z_angle}, " if z_angle is not None else "") + """
         }
     };
 """
