@@ -33,8 +33,6 @@ def main():
         description='Run a specific project file.')
     parser.add_argument('project', type=str,
                         help='The name of the project to run.')
-    parser.add_argument('--output', type=str, default=None,
-                        help='The output directory for the generated files.')
     args = parser.parse_args()
 
     project_name = normalize_project_name(args.project)
@@ -46,15 +44,14 @@ def main():
         print(f"Module '{module_name}' not found.")
         return
 
-    output_dir = os.path.dirname(os.path.realpath(args.output)) if args.output else os.getcwd()
-    output_name = os.path.basename(args.output) if args.output else project_name + '.pdf'
+    
     project_dir = os.path.dirname(
         project_module.__file__)
     program = project_module.main
     os.chdir(project_dir)
     program()
     # run pdflatex
-    os.system(f"pdflatex {os.getcwd() + os.sep}run.tex -output-directory={output_dir} -jobname={output_name}")
+    os.system(f"pdflatex {os.getcwd() + os.sep}run.tex")
     os.chdir(cwd) # restore the original working directory
 
 
